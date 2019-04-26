@@ -5,10 +5,7 @@ import javax.validation.constraints.NotNull;
 
 @Table(name = "CityTemp")
 @Entity
-public class CityTemp {
-
-    @GeneratedValue
-    Long id;
+public class CityTemperature {
 
     @Id
     @Column(name = "Name")
@@ -18,17 +15,12 @@ public class CityTemp {
     @Column(name = "Temperature")
     private Integer temperature;
 
-    public CityTemp(@NotNull String name, Integer temperature) {
+    public CityTemperature(){
+
+    }
+    public CityTemperature(@NotNull String name, Integer temperature) {
         this.name = name;
         this.temperature = temperature;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public Integer getTemperature() {

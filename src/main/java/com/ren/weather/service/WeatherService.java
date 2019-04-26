@@ -1,33 +1,40 @@
 package com.ren.weather.service;
 
-import com.ren.weather.entity.CityTemp;
+import com.ren.weather.entity.CityTemperature;
+import com.ren.weather.exceptions.CityTemperatureException;
 import com.ren.weather.repository.WeatherRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.util.StringUtils;
+import javax.annotation.Resource;
 import java.util.List;
 
 @Component
 @Service
 public class WeatherService {
-    @Autowired
+    @Resource
     private WeatherRepository weatherRepository;
 
     public WeatherService(WeatherRepository weatherRepository) {
         this.weatherRepository = weatherRepository;
     }
 
-    public String testInsert(String cityName) {
-        CityTemp city = new CityTemp(cityName, 40);
-
-        this.weatherRepository.save(city);
-        System.out.println("city insert operation #####");
-        return  "Inserted: " + city;
+    public void add( CityTemperature cityTemp) {
+        if (cityTemp != null)
+            this.weatherRepository.save(cityTemp);
     }
 
-    @RequestMapping("/find")
-    public List<CityTemp> findAll() {
-        return (List<CityTemp>) this.weatherRepository.findAll();
+    public CityTemperature findByCity(String city) {
+        return weatherRepository.findById(city).orElseThrow(() ->
+                new CityTemperatureException(HttpStatus.NOT_FOUND, "Resource Not Found"));
+    }
+
+    public List<CityTemperature> findByPrefix(String prefix) {
+        if (StringUtils.isEmpty(prefix) || prefix.length() < 3) {
+                throw new CityTemperatureException(HttpStatus.BAD_REQUEST, "Too few characters");
+        }
+        String pattern = prefix.concat("%");
+        return weatherRepository.findByNameLike(pattern);
     }
 }
